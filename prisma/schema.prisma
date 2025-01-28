@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ClubAdmin {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  events   Event[]
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+}
+
+model Event {
+  id           Int      @id @default(autoincrement())
+  name         String
+  time         DateTime
+  poster       String   // Store Base64 encoded image
+  gformLink    String?
+  locationLink String?
+  createdById  Int
+  createdBy    ClubAdmin @relation(fields: [createdById], references: [id])
+}

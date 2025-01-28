@@ -1,0 +1,24 @@
+{
+    "name": "clubs-announcement-backend",
+    "version": "1.0.0",
+    "description": "Backend for clubs announcement app",
+    "main": "final.js",
+    "scripts": {
+      "start": "node final.js",
+      "dev": "nodemon final.js",
+      "prisma:migrate": "npx prisma migrate dev",
+      "prisma:generate": "npx prisma generate"
+    },
+    "dependencies": {
+      "@prisma/client": "^5.0.0",
+      "bcrypt": "^5.1.0",
+      "body-parser": "^1.20.2",
+      "dotenv": "^16.3.1",
+      "express": "^4.18.2",
+      "jsonwebtoken": "^9.0.1"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1"
+    }
+  }
+  
