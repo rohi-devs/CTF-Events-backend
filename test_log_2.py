@@ -3,7 +3,9 @@ import json
 from datetime import datetime, timedelta
 import uuid
 
-BASE_URL = "http://localhost:5000"
+# BASE_URL = "http://localhost:5000"
+
+BASE_URL = "https://ctf-events-backend.onrender.com"
 
 class TestCTFEventsAPI:
     def __init__(self):

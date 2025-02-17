@@ -3,8 +3,9 @@
     "version": "1.0.0",
     "description": "Backend for clubs announcement app",
     "main": "final.js",
+    "postinstall": "prisma generate",
     "scripts": {
-      "start": "node final.js",
+      "start": "npm run prisma:generate && node final.js",
       "dev": "nodemon final.js",
       "prisma:migrate": "npx prisma migrate dev",
       "prisma:generate": "npx prisma generate"
