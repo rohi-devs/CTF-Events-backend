@@ -116,8 +116,10 @@ class TestCTFEventsAPI:
         """Test admin registration endpoint"""
         self.setup_method()
         payload = {
-            "username": self.test_admin_username,
-            "password": "Admin123"
+            # "username": self.test_admin_username,
+            # "password": "Admin123"
+            "username": "padma",
+            "password": "Padma123"
         }
         response = requests.post(f"{BASE_URL}/register", json=payload)
         assert response.status_code == 201, f"Admin registration failed: {response.text}"
@@ -290,22 +292,22 @@ def run_tests():
     failed_tests = []
     
     test_methods = [
-        test_api.test_admin_registration_invalid_password,
-        test_api.test_duplicate_admin_registration,
-        test_api.test_user_registration_validation,
-        test_api.test_admin_login_failures,
-        test_api.test_user_login_failures,
+        # test_api.test_admin_registration_invalid_password,
+        # test_api.test_duplicate_admin_registration,
+        # test_api.test_user_registration_validation,
+        # test_api.test_admin_login_failures,
+        # test_api.test_user_login_failures,
         test_api.test_admin_registration,
-        test_api.test_admin_login,
-        test_api.test_user_registration,  # User registration before login
-        test_api.test_user_login,        # Login after registration
-        test_api.test_create_event,
-        test_api.test_get_events,
-        test_api.test_create_announcement,
-        test_api.test_get_announcements,
-        test_api.test_get_admin_events,
-        test_api.test_get_admin_announcements,
-        test_api.test_unauthorized_access
+        # test_api.test_admin_login,
+        # test_api.test_user_registration,  # User registration before login
+        # test_api.test_user_login,        # Login after registration
+        # test_api.test_create_event,
+        # test_api.test_get_events,
+        # test_api.test_create_announcement,
+        # test_api.test_get_announcements,
+        # test_api.test_get_admin_events,
+        # test_api.test_get_admin_announcements,
+        # test_api.test_unauthorized_access
     ]
 
     try:

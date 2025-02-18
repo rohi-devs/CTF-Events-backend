@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -35,7 +37,37 @@ const validatePassword = (password) => {
   return { valid: true };
 };
 
-// Admin Registration
+// Swagger UI route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new admin
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Admin registered successfully
+ *       400:
+ *         description: Invalid input
+ *       409:
+ *         description: Username already exists
+ */
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
@@ -74,7 +106,32 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Admin Login
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Admin login
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -107,6 +164,34 @@ app.post('/login', async (req, res) => {
 });
 
 // User Registration
+/**
+ * @swagger
+ * /register-user:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid input
+ *       409:
+ *         description: Username already exists
+ */
 app.post('/register-user', async (req, res) => {
   const { username, password } = req.body;
 
@@ -146,6 +231,39 @@ app.post('/register-user', async (req, res) => {
 });
 
 // User Login
+/**
+ * @swagger
+ * /login-user:
+ *   post:
+ *     summary: User login
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Invalid credentials
+ */
 app.post('/login-user', async (req, res) => {
   const { username, password } = req.body;
 
@@ -177,7 +295,50 @@ app.post('/login-user', async (req, res) => {
   }
 });
 
-// Add Event (with authorization check)
+/**
+ * @swagger
+ * /events:
+ *   post:
+ *     summary: Create a new event
+ *     tags: [Events]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - description
+ *               - dateTime
+ *             properties:
+ *               title:
+ *                 type: string
+ *               subtitle:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               dateTime:
+ *                 type: string
+ *                 format: date-time
+ *               poster:
+ *                 type: string
+ *               gformLink:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               locationLink:
+ *                 type: string
+ *               instaLink:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Event created successfully
+ *       403:
+ *         description: Access denied
+ */
 app.post('/events', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send('Access Denied: Only admins can add events');
@@ -208,7 +369,16 @@ app.post('/events', authenticateToken, async (req, res) => {
   }
 });
 
-// Get All Events
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     summary: Get all events
+ *     tags: [Events]
+ *     responses:
+ *       200:
+ *         description: List of all events
+ */
 app.get('/events', async (req, res) => {
   try {
     const events = await prisma.event.findMany({
@@ -228,7 +398,37 @@ app.get('/events', async (req, res) => {
   }
 });
 
-// Add Announcement (admin only)
+/**
+ * @swagger
+ * /announcements:
+ *   post:
+ *     summary: Create a new announcement
+ *     tags: [Announcements]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - description
+ *             properties:
+ *               description:
+ *                 type: string
+ *               poster:
+ *                 type: string
+ *               instaLink:
+ *                 type: string
+ *               gformLink:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Announcement created successfully
+ *       403:
+ *         description: Access denied
+ */
 app.post('/announcements', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send('Access Denied: Only admins can add announcements');
@@ -275,6 +475,25 @@ app.get('/announcements', async (req, res) => {
 });
 
 // Get Events by Admin Username
+/**
+ * @swagger
+ * /events/admin/{username}:
+ *   get:
+ *     summary: Get events by admin username
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Admin username
+ *     responses:
+ *       200:
+ *         description: List of events by admin
+ *       500:
+ *         description: Server error
+ */
 app.get('/events/admin/:username', async (req, res) => {
   const { username } = req.params;
   try {
@@ -298,6 +517,25 @@ app.get('/events/admin/:username', async (req, res) => {
 });
 
 // Get Announcements by Admin Username
+/**
+ * @swagger
+ * /announcements/admin/{username}:
+ *   get:
+ *     summary: Get announcements by admin username
+ *     tags: [Announcements]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Admin username
+ *     responses:
+ *       200:
+ *         description: List of announcements by admin
+ *       500:
+ *         description: Server error
+ */
 app.get('/announcements/admin/:username', async (req, res) => {
   const { username } = req.params;
   try {
@@ -319,6 +557,60 @@ app.get('/announcements/admin/:username', async (req, res) => {
     res.status(500).send('Error fetching announcements: ' + err.message);
   }
 });
+
+// Add schemas for common models
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Event:
+ *       type: object
+ *       required:
+ *         - title
+ *         - description
+ *         - dateTime
+ *       properties:
+ *         id:
+ *           type: integer
+ *         title:
+ *           type: string
+ *         subtitle:
+ *           type: string
+ *         description:
+ *           type: string
+ *         dateTime:
+ *           type: string
+ *           format: date-time
+ *         poster:
+ *           type: string
+ *         gformLink:
+ *           type: string
+ *         location:
+ *           type: string
+ *         locationLink:
+ *           type: string
+ *         instaLink:
+ *           type: string
+ *         createdById:
+ *           type: integer
+ *     Announcement:
+ *       type: object
+ *       required:
+ *         - description
+ *       properties:
+ *         id:
+ *           type: integer
+ *         description:
+ *           type: string
+ *         poster:
+ *           type: string
+ *         instaLink:
+ *           type: string
+ *         gformLink:
+ *           type: string
+ *         createdById:
+ *           type: integer
+ */
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
