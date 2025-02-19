@@ -612,5 +612,44 @@ app.get('/announcements/admin/:username', async (req, res) => {
  *           type: integer
  */
 
+// Get Event by Event ID
+app.get('/events/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(id) }, // Fetch a single event by its ID
+    });
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json(event);
+  } catch (err) {
+    console.error("Error fetching event:", err);
+    res.status(500).send("Error fetching event: " + err.message);
+  }
+});
+
+// Get Announcement by Announcement ID
+app.get('/announcements/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const announcement = await prisma.announcement.findUnique({
+      where: { id: parseInt(id) }, // Fetch a single announcement by its ID
+    });
+
+    if (!announcement) {
+      return res.status(404).json({ error: "Announcement not found" });
+    }
+
+    res.json(announcement);
+  } catch (err) {
+    console.error("Error fetching announcement:", err);
+    res.status(500).send("Error fetching announcement: " + err.message);
+  }
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
