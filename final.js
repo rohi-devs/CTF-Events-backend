@@ -642,30 +642,30 @@ app.get('/announcements/:id', async (req, res) => {
   }
 });
 
-app.get('/events/username/:id', async (req, res) => {
-  const { id } = req.params;
-  
+app.get('/events/username', async (req, res) => {
   try {
-    const event = await prisma.event.findUnique({
-      where: { id: parseInt(id) },
+    const events = await prisma.event.findMany({
       include: {
-        createdBy: { 
-          select: { username: true }
-        }
-      }
+        createdBy: {
+          select: { username: true },
+        },
+      },
+      orderBy: {
+        dateTime: 'desc',
+      },
     });
 
-    res.json({
-      id: event.id,
-      createdById: event.createdById,
+    const formattedEvents = events.map(event => ({
+      ...event,
       createdByUsername: event.createdBy?.username || "Unknown",
-    });
+    }));
 
+    res.json(formattedEvents);
   } catch (err) {
-    console.error("Error fetching event:", err);
-    res.status(500).json({ error: "Error fetching event", details: err.message });
+    res.status(500).json({ error: "Error fetching events", details: err.message });
   }
 });
+
 
 
 const PORT = process.env.PORT || 5000;
