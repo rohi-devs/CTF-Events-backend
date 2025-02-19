@@ -617,12 +617,8 @@ app.get('/events/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const event = await prisma.event.findUnique({
-      where: { id: parseInt(id) }, // Fetch a single event by its ID
+      where: { id: parseInt(id) }, 
     });
-
-    if (!event) {
-      return res.status(404).json({ error: "Event not found" });
-    }
 
     res.json(event);
   } catch (err) {
@@ -636,17 +632,38 @@ app.get('/announcements/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const announcement = await prisma.announcement.findUnique({
-      where: { id: parseInt(id) }, // Fetch a single announcement by its ID
+      where: { id: parseInt(id) }, 
     });
-
-    if (!announcement) {
-      return res.status(404).json({ error: "Announcement not found" });
-    }
 
     res.json(announcement);
   } catch (err) {
     console.error("Error fetching announcement:", err);
     res.status(500).send("Error fetching announcement: " + err.message);
+  }
+});
+
+app.get('/events/username/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        createdBy: { 
+          select: { username: true }
+        }
+      }
+    });
+
+    res.json({
+      id: event.id,
+      createdById: event.createdById,
+      createdByUsername: event.createdBy?.username || "Unknown",
+    });
+
+  } catch (err) {
+    console.error("Error fetching event:", err);
+    res.status(500).json({ error: "Error fetching event", details: err.message });
   }
 });
 
