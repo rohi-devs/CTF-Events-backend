@@ -642,7 +642,7 @@ app.get('/announcements/:id', async (req, res) => {
   }
 });
 
-app.get('/events/details', async (req, res) => {
+app.get('/events_with_creators', async (req, res) => {
   try {
     const events = await prisma.event.findMany({
       include: {
