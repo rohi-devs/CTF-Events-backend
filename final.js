@@ -642,7 +642,7 @@ app.get('/announcements/:id', async (req, res) => {
   }
 });
 
-app.get('/events/username', async (req, res) => {
+app.get('/events/details', async (req, res) => {
   try {
     const events = await prisma.event.findMany({
       include: {
@@ -656,15 +656,24 @@ app.get('/events/username', async (req, res) => {
     });
 
     const formattedEvents = events.map(event => ({
-      ...event,
-      createdByUsername: event.createdBy?.username || "Unknown",
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      poster: event.poster,
+      dateTime: event.dateTime,
+      locationLink: event.locationLink,
+      gformLink: event.gformLink,
+      instaLink: event.instaLink,
+      createdByUsername: event.createdBy ? event.createdBy.username : "Unknown",
     }));
 
     res.json(formattedEvents);
   } catch (err) {
+    console.error("Error fetching events:", err);
     res.status(500).json({ error: "Error fetching events", details: err.message });
   }
 });
+
 
 
 
