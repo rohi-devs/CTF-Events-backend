@@ -617,12 +617,31 @@ app.get('/events/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const event = await prisma.event.findUnique({
+      include: {
+        createdBy: {
+          select: { username: true },
+        },
+      },
       where: { id: parseInt(id) }, 
     });
 
-    res.json(event);
+    const formattedEvents = event.map(event => ({
+      id: event.id,
+      title: event.title,
+      subtitle: event.subtitle,
+      description: event.description,
+      poster: event.poster,
+      dateTime: event.dateTime,
+      location: event.location,
+      locationLink: event.locationLink,
+      gformLink: event.gformLink,
+      instaLink: event.instaLink,
+      createdByUsername: event.createdBy ? event.createdBy.username : "Unknown",
+    }));
+
+    res.json(formattedEvents);
+
   } catch (err) {
-    console.error("Error fetching event:", err);
     res.status(500).send("Error fetching event: " + err.message);
   }
 });
@@ -632,12 +651,25 @@ app.get('/announcements/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const announcement = await prisma.announcement.findUnique({
+      include: {
+        createdBy: {
+          select: { username: true },
+        },
+      },
       where: { id: parseInt(id) }, 
     });
 
-    res.json(announcement);
+    const formattedAnnouncements = announcement.map(announcement => ({
+      id: announcement.id,
+      description: announcement.description,
+      poster: announcement.poster,
+      gformLink: announcement.gformLink,
+      instaLink: announcement.instaLink,
+      createdByUsername: announcement.createdBy ? announcement.createdBy.username : "Unknown",
+    }));
+
+    res.json(formattedAnnouncements);
   } catch (err) {
-    console.error("Error fetching announcement:", err);
     res.status(500).send("Error fetching announcement: " + err.message);
   }
 });
@@ -658,9 +690,11 @@ app.get('/events_with_creators', async (req, res) => {
     const formattedEvents = events.map(event => ({
       id: event.id,
       title: event.title,
+      subtitle: event.subtitle,
       description: event.description,
       poster: event.poster,
       dateTime: event.dateTime,
+      location: event.location,
       locationLink: event.locationLink,
       gformLink: event.gformLink,
       instaLink: event.instaLink,
@@ -669,12 +703,38 @@ app.get('/events_with_creators', async (req, res) => {
 
     res.json(formattedEvents);
   } catch (err) {
-    console.error("Error fetching events:", err);
     res.status(500).json({ error: "Error fetching events", details: err.message });
   }
 });
 
 
+app.get('/announcements_with_creators', async (req, res) => {
+  try {
+    const announcements = await prisma.announcement.findMany({
+      include: {
+        createdBy: {
+          select: { username: true },
+        },
+      },
+      orderBy: {
+        dateTime: 'desc',
+      },
+    });
+
+    const formattedAnnouncements = announcements.map(announcement => ({
+      id: announcement.id,
+      description: announcement.description,
+      poster: announcement.poster,
+      gformLink: announcement.gformLink,
+      instaLink: announcement.instaLink,
+      createdByUsername: announcement.createdBy ? announcement.createdBy.username : "Unknown",
+    }));
+
+    res.json(formattedAnnouncements);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching events", details: err.message });
+  }
+});
 
 
 const PORT = process.env.PORT || 5000;
