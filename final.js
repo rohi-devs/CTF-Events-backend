@@ -625,7 +625,7 @@ app.get('/events/:id', async (req, res) => {
       where: { id: parseInt(id) }, 
     });
 
-    const formattedEvents = event.map(event => ({
+    const formattedEvent = {
       id: event.id,
       title: event.title,
       subtitle: event.subtitle,
@@ -636,10 +636,10 @@ app.get('/events/:id', async (req, res) => {
       locationLink: event.locationLink,
       gformLink: event.gformLink,
       instaLink: event.instaLink,
-      createdByUsername: event.createdBy ? event.createdBy.username : "Unknown",
-    }));
-
-    res.json(formattedEvents);
+      createdByUsername: event.createdBy ? event.createdBy.username : "UnknownGuest",
+    };
+    
+    res.json(formattedEvent);
 
   } catch (err) {
     res.status(500).send("Error fetching event: " + err.message);
@@ -659,14 +659,14 @@ app.get('/announcements/:id', async (req, res) => {
       where: { id: parseInt(id) }, 
     });
 
-    const formattedAnnouncements = announcement.map(announcement => ({
+    const formattedAnnouncements = {
       id: announcement.id,
       description: announcement.description,
       poster: announcement.poster,
       gformLink: announcement.gformLink,
       instaLink: announcement.instaLink,
-      createdByUsername: announcement.createdBy ? announcement.createdBy.username : "Unknown",
-    }));
+      createdByUsername: announcement.createdBy ? announcement.createdBy.username : "UnknownGuest",
+    };
 
     res.json(formattedAnnouncements);
   } catch (err) {
