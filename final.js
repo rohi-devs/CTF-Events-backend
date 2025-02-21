@@ -716,6 +716,9 @@ app.get('/announcements_with_creators', async (req, res) => {
           select: { username: true },
         },
       },
+      orderBy: {
+        id: 'desc',
+      },
     });
 
     const formattedAnnouncements = announcements.map(announcement => ({
